@@ -1,11 +1,21 @@
-import React from 'react';
-
+import React, { useEffect, useState } from 'react';
+import fetch from 'isomorphic-unfetch'
 import './app.css';
 
 import { ReactComponent as Logo } from './logo.svg';
 import star from './star.svg';
 
 export function App() {
+  const [dummy, setDummy] = useState<string>(null)
+  useEffect(() => {
+    fetch('http://localhost:3333/api/products')
+    .then(data => data.json())
+    .then(data => {
+      setDummy(JSON.stringify(data, null, 2))
+    }).catch(e => {
+      console.log(e)
+    })
+  })
   /*
    * Replace the elements below with your own.
    *
@@ -19,6 +29,7 @@ export function App() {
       </header>
       <main>
         <h2>Resources &amp; Tools</h2>
+        <pre><code>{dummy}</code></pre>
         <p>Thank you for using and showing some ♥ for Nx.</p>
         <div className="flex github-star-container">
           <a

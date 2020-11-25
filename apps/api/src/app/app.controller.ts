@@ -10,4 +10,9 @@ export class AppController {
   getData() {
     return this.appService.getData();
   }
+
+  @Get('products')
+  public listPlans() {
+    return this.appService.listProducts()
+  }
 }
