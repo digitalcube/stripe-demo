@@ -30,18 +30,15 @@ if (process.env.NX_CLI_SET) {
 
 // Run Nestjs application in AWS Lambda
 export const handler: APIGatewayProxyHandler = async (event, context) => {
-  console.log(JSON.stringify(event))
-  const app = new ServerlessNestjsApplicationFactory<AppModule>(
-    AppModule,
-    {
-        // NestFactory.create's option object
-        cors: {
-          origin: '*',
-          allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-        },
-    }
-  );
+  console.log(JSON.stringify(event));
+  const app = new ServerlessNestjsApplicationFactory<AppModule>(AppModule, {
+    // NestFactory.create's option object
+    cors: {
+      origin: '*',
+      allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+    },
+  });
   const result = await app.run(event, context);
-  console.log(JSON.stringify(result))
+  console.log(JSON.stringify(result));
   return result;
 };

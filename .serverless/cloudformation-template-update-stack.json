@@ -18,37 +18,23 @@
             {
               "Effect": "Allow",
               "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
+                "Service": ["lambda.amazonaws.com"]
               },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+              "Action": ["sts:AssumeRole"]
             }
           ]
         },
         "Policies": [
           {
             "PolicyName": {
-              "Fn::Join": [
-                "-",
-                [
-                  "stripe-demo-api",
-                  "development",
-                  "lambda"
-                ]
-              ]
+              "Fn::Join": ["-", ["stripe-demo-api", "development", "lambda"]]
             },
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:CreateLogStream",
-                    "logs:CreateLogGroup"
-                  ],
+                  "Action": ["logs:CreateLogStream", "logs:CreateLogGroup"],
                   "Resource": [
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/stripe-demo-api-development*:*"
@@ -57,9 +43,7 @@
                 },
                 {
                   "Effect": "Allow",
-                  "Action": [
-                    "logs:PutLogEvents"
-                  ],
+                  "Action": ["logs:PutLogEvents"],
                   "Resource": [
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/stripe-demo-api-development*:*:*"
@@ -97,10 +81,7 @@
         "Handler": "dist/apps/api/main.handler",
         "MemorySize": 256,
         "Role": {
-          "Fn::GetAtt": [
-            "IamRoleLambdaExecution",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IamRoleLambdaExecution", "Arn"]
         },
         "Runtime": "nodejs12.x",
         "Timeout": 30,
@@ -128,9 +109,7 @@
           "arn:aws:lambda:us-east-1:213144662080:layer:stripe-demo-api-development-nodejs-default:1"
         ]
       },
-      "DependsOn": [
-        "IndexLogGroup"
-      ]
+      "DependsOn": ["IndexLogGroup"]
     },
     "IndexLambdaVersionLSPikHHv9Qhi4pza6uG1aoeGqMkdEj4LaJ98f4RRJo": {
       "Type": "AWS::Lambda::Version",
@@ -147,9 +126,7 @@
       "Properties": {
         "Name": "development-stripe-demo-api",
         "EndpointConfiguration": {
-          "Types": [
-            "EDGE"
-          ]
+          "Types": ["EDGE"]
         },
         "Policy": ""
       }
@@ -158,10 +135,7 @@
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
+          "Fn::GetAtt": ["ApiGatewayRestApi", "RootResourceId"]
         },
         "PathPart": "{proxy+}",
         "RestApiId": {
@@ -207,10 +181,7 @@
           ]
         },
         "ResourceId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
+          "Fn::GetAtt": ["ApiGatewayRestApi", "RootResourceId"]
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -268,10 +239,7 @@
         "HttpMethod": "ANY",
         "RequestParameters": {},
         "ResourceId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
+          "Fn::GetAtt": ["ApiGatewayRestApi", "RootResourceId"]
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -295,10 +263,7 @@
                 },
                 ":lambda:path/2015-03-31/functions/",
                 {
-                  "Fn::GetAtt": [
-                    "IndexLambdaFunction",
-                    "Arn"
-                  ]
+                  "Fn::GetAtt": ["IndexLambdaFunction", "Arn"]
                 },
                 "/invocations"
               ]
@@ -338,10 +303,7 @@
                 },
                 ":lambda:path/2015-03-31/functions/",
                 {
-                  "Fn::GetAtt": [
-                    "IndexLambdaFunction",
-                    "Arn"
-                  ]
+                  "Fn::GetAtt": ["IndexLambdaFunction", "Arn"]
                 },
                 "/invocations"
               ]
@@ -370,10 +332,7 @@
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
-          "Fn::GetAtt": [
-            "IndexLambdaFunction",
-            "Arn"
-          ]
+          "Fn::GetAtt": ["IndexLambdaFunction", "Arn"]
         },
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
