@@ -1,126 +1,206 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import fetch from 'isomorphic-unfetch'
-import './app.css';
+import { AppLayout, Button, Column, ColumnLayout, Container, Header, KeyValuePair, RadioButton, RadioGroup, Stack, Wizard } from 'aws-northstar';
+import { WizardStep } from 'aws-northstar/components/Wizard/types';
+import { StepClickDetail } from 'aws-northstar/components/Wizard';
 
-import { ReactComponent as Logo } from './logo.svg';
-import star from './star.svg';
+class SessionStorage {
+  public static setStripeCustomerId(customerId: string) {
+    window.sessionStorage.setItem('dc-stripe-demo-customer-id', customerId)
+  }
+  public static getStripeCustomerId(): string {
+    return window.sessionStorage.getItem('dc-stripe-demo-customer-id')
+  }
+}
+
+const getWizardStep1 = (customerId?: string):WizardStep => {
+  if (customerId) {
+    return {
+      title: 'Stripeに顧客情報を登録する',
+      description: 'Stripeカスタマーポータルを利用するには、Stripeに顧客情報を登録する必要があります。',
+      content: (
+        <p>すでにカスタマーを一度作成されています。Nextをクリックして、次に進みましょう。</p>
+      )
+    }
+  }
+  return {
+    title: 'Stripeに顧客情報を登録する',
+    description: 'Stripeカスタマーポータルを利用するには、Stripeに顧客情報を登録する必要があります。\nここではダミーのデータを一度作成し、ブラウザにそのカスタマーのIDを一時的に記録します。',
+    content: (
+      <p>Nextをクリックして、次に進みましょう。</p>
+    )
+  }
+}
+
+
+const useWizardNextStepHandler = () => {
+  const [portalUrl, setPortalURL] = useState('')
+  const onNext = useCallback((stepClickDetail: StepClickDetail) => {
+    const customerId = SessionStorage.getStripeCustomerId()
+    switch(stepClickDetail.requestedStepIndex) {
+      case 1: {
+        if (customerId) return true;
+        fetch('http://localhost:3333/api/customers', {
+          method: 'put'
+        })
+          .then(data => data.json())
+          .then(data => {
+            console.log(data)
+            SessionStorage.setStripeCustomerId(data.customerId)
+          }).catch(e => {
+            window.alert(e)
+          })
+        return true;
+      }
+      case 2: {
+        if (!customerId) return false;
+        fetch('http://localhost:3333/api/customers/' +customerId +'/subscriptions/sample', {
+          method: 'put'
+          }).catch(e => {
+            window.alert(e)
+          })
+        return true;
+      }
+      case 3: {
+        if (!customerId) return false;
+        fetch('http://localhost:3333/api/customers/' +customerId +'/billing/portal', {
+          method: 'put'
+        })
+          .then(data => data.json())
+          .then(data => {
+            console.log(data)
+            setPortalURL(data.url)
+          }).catch(e => {
+            window.alert(e)
+          })
+        return true;
+      }
+      default:
+        break;
+    }
+    return true;
+  }, [setPortalURL])
+  return {
+    portalUrl,
+    onNext,
+  }
+}
+
+export type StripePrice = {
+  id: string;
+  nickname: string;
+  unit_amount: number;
+  unit_amount_decimal: string;
+  currency: string;
+  recurring: {
+    aggregate_usage: string | null;
+    interval: string;
+    interval_count: number;
+    trial_period_days: number | null;
+    usage_type: string;
+  }
+}
+export type StripePrices = Array<StripePrice>
+export type StripeProduct = {
+  id: string;
+  description: string;
+  name: string;
+  images: string[];
+  prices: StripePrices
+}
+export type StripeProducts = Array<StripeProduct>
 
 export function App() {
-  const [dummy, setDummy] = useState<string>(null)
+  const [products, setProducts] = useState<StripeProducts>([])
   useEffect(() => {
-    fetch('http://localhost:3333/api/products')
+    fetch('http://localhost:3333/api/products/prices')
     .then(data => data.json())
     .then(data => {
-      setDummy(JSON.stringify(data, null, 2))
+      setProducts(data)
     }).catch(e => {
       console.log(e)
     })
-  })
+  },[])
+  const {onNext, portalUrl} = useWizardNextStepHandler()
+  const customerId = SessionStorage.getStripeCustomerId()
+
+  const steps: WizardStep[] = useMemo(() => {
+    return [
+      getWizardStep1(customerId),
+    {
+      title: '定期購読を開始する',
+      description: 'Stripeカスタマーポータルで管理するための定期購読プランを作成します。\nデモサイトですので、課金などは発生しません。',
+      content: (
+        <p>Nextをクリックして、次に進みましょう。</p>
+      )
+    }, {
+      title: 'カスタマーポータルへのアクセスURLを作成する',
+      description: 'Stripeカスタマーポータルを利用するには、Stripeに顧客情報を登録する必要があります。',
+      content: (
+        <p>Nextをクリックして、次に進みましょう。</p>
+      )
+    }, {
+      title: 'カスタマーポータルを開く',
+      description: 'URLが作成できました！早速ポータルにアクセスしましょう！',
+      content: (
+        <>
+          <code>{portalUrl}</code>
+          <Button href={portalUrl} type="button" variant="link">ポータルへ移動する</Button>
+        </>
+      )
+    }]
+  }, [customerId, portalUrl])
   /*
    * Replace the elements below with your own.
    *
    * Note: The corresponding styles are in the ./app.css file.
    */
   return (
-    <div className="app">
-      <header className="flex">
-        <Logo width="75" height="75" />
-        <h1>Welcome to frontend!</h1>
-      </header>
-      <main>
-        <h2>Resources &amp; Tools</h2>
-        <pre><code>{dummy}</code></pre>
-        <p>Thank you for using and showing some ♥ for Nx.</p>
-        <div className="flex github-star-container">
-          <a
-            href="https://github.com/nrwl/nx"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {' '}
-            If you like Nx, please give it a star:
-            <div className="github-star-badge">
-              <img src={star} className="material-icons" alt="" />
-              Star
-            </div>
+    <AppLayout
+      header={<Header title="Stripe Demo by Digitalcube" />}
+    >
+      <Container>
+        <Wizard
+          steps={steps}
+          onNextButtonClick={onNext}
+        />
+        {portalUrl ? (
+          <a href={portalUrl} target="_blank" rel="noopener">
+            Portal
           </a>
-        </div>
-        <p>Here are some links to help you get started.</p>
-        <ul className="resources">
-          <li className="col-span-2">
-            <a
-              className="resource flex"
-              href="https://connect.nrwl.io/app/courses/nx-workspaces/intro"
-            >
-              Nx video course
-            </a>
-          </li>
-          <li className="col-span-2">
-            <a
-              className="resource flex"
-              href="https://nx.dev/react/getting-started/what-is-nx"
-            >
-              Nx video tutorial
-            </a>
-          </li>
-          <li className="col-span-2">
-            <a
-              className="resource flex"
-              href="https://nx.dev/react/tutorial/01-create-application"
-            >
-              Interactive tutorial
-            </a>
-          </li>
-          <li className="col-span-2">
-            <a className="resource flex" href="https://nx.app/">
-              <svg
-                width="36"
-                height="36"
-                viewBox="0 0 120 120"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M120 15V30C103.44 30 90 43.44 90 60C90 76.56 76.56 90 60 90C43.44 90 30 103.44 30 120H15C6.72 120 0 113.28 0 105V15C0 6.72 6.72 0 15 0H105C113.28 0 120 6.72 120 15Z"
-                  fill="#0E2039"
-                />
-                <path
-                  d="M120 30V105C120 113.28 113.28 120 105 120H30C30 103.44 43.44 90 60 90C76.56 90 90 76.56 90 60C90 43.44 103.44 30 120 30Z"
-                  fill="white"
-                />
-              </svg>
-              <span className="gutter-left">Nx Cloud</span>
-            </a>
-          </li>
-        </ul>
-        <h2>Next Steps</h2>
-        <p>Here are some things you can do with Nx.</p>
-        <details open>
-          <summary>Add UI library</summary>
-          <pre>{`# Generate UI lib
-nx g @nrwl/react:lib ui
-
-# Add a component
-nx g @nrwl/react:component xyz --project ui`}</pre>
-        </details>
-        <details>
-          <summary>View dependency graph</summary>
-          <pre>{`nx dep-graph`}</pre>
-        </details>
-        <details>
-          <summary>Run affected commands</summary>
-          <pre>{`# see what's been affected by changes
-nx affected:dep-graph
-
-# run tests for current changes
-nx affected:test
-
-# run e2e tests for current changes
-nx affected:e2e
-  `}</pre>
-        </details>
-      </main>
-    </div>
+        ): null}
+      </Container>
+      <Container>
+        <ColumnLayout>
+        {products.map(product => {
+          return (
+            <Column key={product.id}>
+              <Stack>
+                {product.images && product.images.length > 0 ? (
+                  <img src={product.images[0]} style={{
+                    height: 'auto',
+                    maxWidth: '100%'
+                  }} />
+                ):null}
+                <KeyValuePair label="Product name" value={product.name} />
+                <KeyValuePair label="Description" value={product.description} />
+                <KeyValuePair label="Prices" value={(
+                  <RadioGroup
+                    items={product.prices.map(price => (
+                      <RadioButton key={price.id} value={price.id}>
+                        {price.nickname} <br/>
+                        {price.currency.toLocaleUpperCase()} {price.unit_amount.toLocaleString()} / {price.recurring.interval_count} {price.recurring.interval}
+                      </RadioButton>
+                    ))}
+                  />
+                )} />
+              </Stack>
+            </Column>
+          )
+        })}
+        </ColumnLayout>
+      </Container>
+    </AppLayout>
   );
 }
 

@@ -1,0 +1,66 @@
+service: stripe-demo-api
+
+
+custom:
+  stage:  ${opt:stage, self:provider.stage}
+  logRetentionInDays:
+    development: 14  # stage[development]は14日
+    production: 90   # stage[production]は90日
+    default: 3       # stageが見つからなかったらこれにfallbackするために設定
+  memorySize:
+    development: 256   # stage[development]は256M
+    production: 512    # stage[production]は512M
+    default: 256       # stageが見つからなかったらこれにfallbackするために設定
+  prune:
+    automatic: true
+    number: 3
+  apiGatewayTags:
+    Stage: ${self:custom.stage}
+    Service: stripe-demo
+    Maintainer: hideokamoto
+  serverless-layers:
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: serverless.${self:provider.region}.development.layers
+    packageManager: yarn
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  profile: default
+  stage: development
+  timeout: 30
+  memorySize: ${self:custom.memorySize.${self:custom.stage}, self:custom.memorySize.default}
+  deploymentBucket:
+    name: serverless.${self:provider.region}.development.deploys
+    serverSideEncryption: AES256
+  logRetentionInDays: ${self:custom.logRetentionInDays.${self:custom.stage}, self:custom.logRetentionInDays.default}
+  environment:
+    STAGE: ${self:custom.stage}
+    STRIPE_API_KEY: ${ssm:DEMO_STRIPE_API_KEY~true}
+  tags: ${self:custom.apiGatewayTags}
+
+plugins:
+  - serverless-layers
+  - serverless-tag-api-gateway
+  - serverless-prune-plugin
+
+package:
+  individually: true
+  include:
+    - dist/apps/api/**
+  exclude:
+    - '**'
+
+functions:
+  index:
+    handler: dist/apps/api/main.handler
+    events:
+    - http:
+        cors: true
+        path: '/'
+        method: any
+    - http:
+        cors: true
+        path: '{proxy+}'
+        method: any
