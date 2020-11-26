@@ -2,37 +2,13 @@ import React, {FC, useCallback} from 'react'
 import { Card, Container, Grid, Heading, Text, } from '@digitalcube/galaxy'
 import { Button } from 'theme-ui'
 import { StripePrice, StripeProduct, useListProductsHook } from '../hooks/products'
-import { useStripeJS } from '../provider/StripeJS';
-import { SessionStorage } from '../classes/SessionStorage';
+import { useStripeCheckout } from '../hooks/checkout';
 
 const Price: FC<{
     price: StripePrice;
     product: Pick<StripeProduct, 'name' | 'description' | 'images'>
 }> = ({price, product}) => {
-    const { stripe } = useStripeJS()
-    const customerId = SessionStorage.getStripeCustomerId()
-    const handleBuy = useCallback(() => {
-        if (!stripe) return;
-        stripe.redirectToCheckout({
-            lineItems: [{
-                price: price.id,
-                quantity: 1
-            }],
-            mode: 'subscription',
-            successUrl: 'http://localhost:4200/success?session_id={CHECKOUT_SESSION_ID}',
-            cancelUrl: 'http://localhost:4200',
-            clientReferenceId: customerId
-        })
-        .then((result) => {
-          if (result.error) {
-            console.log(result.error)
-            alert(result.error.message)
-          }
-        }).catch(e => {
-            console.log(e)
-            alert(e.name + ': ' + e.message)
-        });
-    }, [stripe, customerId])
+    const { stripe, handleBuy} = useStripeCheckout(price.id)
     return (
         <Card
             img={product.images ? product.images[0] : null}
