@@ -3,6 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install 12.9
         - nvm use 12.9
         - echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> ~/.npmrc
         - npm config set _authToken $GITHUB_TOKEN
