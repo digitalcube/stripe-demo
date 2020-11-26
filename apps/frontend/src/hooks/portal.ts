@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API } from '../classes/api';
 import {SessionStorage } from '../classes/SessionStorage'
   
 export const useCustomerPortalHook = () => {
@@ -6,7 +7,7 @@ export const useCustomerPortalHook = () => {
     const [url, setPortalURL] = useState<string>(null);
     useEffect(() => {
         if (!customerId) return;
-      fetch(`http://localhost:3333/api/customers/${customerId}/billing/portal`)
+      fetch(API.create(`customers/${customerId}/billing/portal`))
         .then((data) => data.json())
         .then((data) => {
           setPortalURL(data.url);

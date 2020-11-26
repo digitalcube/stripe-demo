@@ -1,7 +1,7 @@
-import React, {  FC, ReactChildren, ReactNode } from 'react';
+import React, {  FC, ReactNode } from 'react';
 import { shifter } from "@digitalcube/galaxy/src/themes/shifter"
 import { ThemeProvider } from 'theme-ui'
-import { Container, Content, Copyright, FooterNav, Grid, Header, Heading, PostHeader, } from '@digitalcube/galaxy'
+import { Container, Copyright, FooterNav, Grid, Header,  } from '@digitalcube/galaxy'
 
 export const Layout: FC<{
     children: ReactNode
@@ -14,29 +14,22 @@ export const Layout: FC<{
         px: '5%'
       }}>
         <Container as="footer">
-          <Grid columns={[1, null, null, null, '4fr 8fr']}>
-            <Content>
-          <Heading size="4" as="h3">
-              Say hello{' '}
-              <span role="img" aria-label="Say hello waving hand">
-                👋
-              </span>
-          </Heading>
-          </Content>
-          </Grid>
           <Grid columns={[1, 2, null, null, 4]}>
           <FooterNav
-            title="Legal"
+            title="About"
             navItems={[{
-              label: 'プライバシーポリシー',
-              href: '/'
+              label: 'Company',
+              href: 'https://www.digitalcube.jp/'
+            }, {
+                label: 'Service',
+                href: 'https://www.digitalcube.jp/products/stripe/'
             }]}
           />
           <FooterNav
             title="Legal"
             navItems={[{
               label: 'プライバシーポリシー',
-              href: '/'
+              href: 'https://www.digitalcube.jp/privacy_policy/'
             }]}
           />
           </Grid>

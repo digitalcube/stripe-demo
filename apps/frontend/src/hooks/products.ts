@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { API } from '../classes/api';
 
 
 export type StripePrice = {
@@ -24,11 +25,11 @@ export type StripePrice = {
     prices: StripePrices;
   };
   export type StripeProducts = Array<StripeProduct>;
-  
+
   export const useListProductsHook = () => {
     const [products, setProducts] = useState<StripeProducts>([]);
     useEffect(() => {
-      fetch('http://localhost:3333/api/products/prices')
+      fetch(API.create('products/prices'))
         .then((data) => data.json())
         .then((data) => {
           setProducts(data);

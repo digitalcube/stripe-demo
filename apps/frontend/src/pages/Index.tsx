@@ -24,7 +24,6 @@ const Price: FC<{
             clientReferenceId: customerId
         })
         .then((result) => {
-            console.log(result)
           if (result.error) {
             console.log(result.error)
             alert(result.error.message)
