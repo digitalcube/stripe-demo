@@ -7,7 +7,25 @@ export const Layout: FC<{
     children: ReactNode
 }> = ({children}) => (
     <ThemeProvider theme={shifter as any}>
-      <Header brand={<h1>Stripe Demo</h1>} href="/" nav={[[], [], []]} />
+      <Header brand={<h1>Stripe Demo</h1>} href="/" nav={[[{
+          label: 'About us',
+          href: 'https://digitalcube.jp'
+      }, {
+        label: 'Stripe',
+        href: 'https://stripe.com/jp'
+      }, {
+          label: 'Stripe導入支援サービス',
+          href: 'https://www.digitalcube.jp/products/stripe/'
+      }], [], [{
+        label: 'About us',
+        href: 'https://digitalcube.jp'
+    }, {
+      label: 'Stripe',
+      href: 'https://stripe.com/jp'
+    }, {
+        label: 'Stripe導入支援サービス',
+        href: 'https://www.digitalcube.jp/products/stripe/'
+    }]]} />
       {children}
       <Container as ="footer" size="3" sx={{
         pt: 7,
