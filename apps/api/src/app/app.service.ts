@@ -56,7 +56,7 @@ export class AppService {
     );
     return results;
   }
-  
+
   public async launchPortal(
     params: Stripe.BillingPortal.SessionCreateParams,
     options?: Stripe.RequestOptions
@@ -65,23 +65,23 @@ export class AppService {
   }
 
   public async getStripeCustomer(customerId: string) {
-    const customer = await this.stripe.customers.retrieve(customerId)
-    if (customer.deleted) throw new NotFoundException('No such customer')
-    const {
-      id,
-      name,
-    } = customer as Stripe.Customer
+    const customer = await this.stripe.customers.retrieve(customerId);
+    if (customer.deleted) throw new NotFoundException('No such customer');
+    const { id, name } = customer as Stripe.Customer;
     return {
       id,
-      name
-    }
+      name,
+    };
   }
 
   public async getCustomerBySession(sessionId: string) {
-    const session = await this.stripe.checkout.sessions.retrieve(sessionId)
-    if (!session || !session.customer) throw new NotFoundException('No such customer')
-    const customerId = typeof session.customer === 'string' ? session.customer : session.customer.id
-    return this.getStripeCustomer(customerId)
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    if (!session || !session.customer)
+      throw new NotFoundException('No such customer');
+    const customerId =
+      typeof session.customer === 'string'
+        ? session.customer
+        : session.customer.id;
+    return this.getStripeCustomer(customerId);
   }
-
 }
