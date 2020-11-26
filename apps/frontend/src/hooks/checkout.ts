@@ -12,7 +12,7 @@ export const useStripeCheckout = (priceId: string) => {
                 quantity: 1
             }],
             mode: 'subscription',
-            successUrl: SiteURL.create('success?session_id={CHECKOUT_SESSION_ID}'),
+            successUrl: SiteURL.create('success/?session_id={CHECKOUT_SESSION_ID}'),
             cancelUrl: SiteURL.create(),
         })
         .then((result) => {
