@@ -3,7 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - yarn install
+        - echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> ~/.npmrc
+        - npm config set _authToken $GITHUB_TOKEN
+        - npm config set registry https://npm.pkg.github.com/digitalcube
+        - npm config set always-auth true
+        - yarn install --prod
     build:
       commands:
         - yarn run build
