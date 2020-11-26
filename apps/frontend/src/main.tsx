@@ -1,16 +1,18 @@
-import { NorthStarThemeProvider } from 'aws-northstar';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import App from './app/app';
-
+import { Layout } from './components/Layout'
+import { StripeJSProvider } from './provider/StripeJS'
 ReactDOM.render(
   <React.StrictMode>
-    <NorthStarThemeProvider>
+    <StripeJSProvider>
       <BrowserRouter>
-        <App />
+        <Layout>
+          <App />
+        </Layout>
       </BrowserRouter>
-    </NorthStarThemeProvider>
+    </StripeJSProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

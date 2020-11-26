@@ -11,31 +11,31 @@ export class AppController {
     return this.appService.getData();
   }
 
-  @Get('products')
-  public listPlans() {
-    return this.appService.listProducts();
-  }
   @Get('products/prices')
   public listPrices() {
-    return this.appService.listPrices();
-  }
-  @Put('customers')
-  public async createCustomer() {
-    const customer = await this.appService.createCustomer();
-    return {
-      customerId: customer.id,
-    };
+    return this.appService.listPrices()
   }
 
-  @Put('customers/:customer_id/billing/portal')
-  public async launchBillingPortal(@Param('customer_id') customerId: string) {
-    const result = await this.appService.launchPortal({
-      customer: customerId,
-    });
-    return result;
-  }
-  @Put('customers/:customer_id/subscriptions/sample')
-  public async createSampleSubscription(
+  @Get('customers/:customer_id')
+  public async getCustomer(
     @Param('customer_id') customerId: string
-  ) {}
+  ) {
+    return this.appService.getStripeCustomer(customerId)
+  }
+  @Get('sessions/:session_id/customer')
+  public async getCustomerBySession(
+    @Param('session_id') sessionId: string
+  ) {
+    return this.appService.getCustomerBySession(sessionId)
+  }
+
+  @Get('customers/:customer_id/billing/portal')
+  public async launchBillingPortal(
+    @Param('customer_id') customerId: string
+  ) {
+    const result = await this.appService.launchPortal({
+      customer: customerId
+    })
+    return result
+  }
 }

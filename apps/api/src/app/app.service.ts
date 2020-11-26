@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -22,6 +22,7 @@ export class AppService {
     }));
     return products;
   }
+
   public async listPrices() {
     const products = await this.listProducts();
     const results = await Promise.all(
@@ -55,13 +56,7 @@ export class AppService {
     );
     return results;
   }
-  public async listPlanByProduct(product) {}
-  public async createCustomer(
-    params?: Stripe.CustomerCreateParams,
-    options?: Stripe.RequestOptions
-  ) {
-    return this.stripe.customers.create(params, options);
-  }
+  
   public async launchPortal(
     params: Stripe.BillingPortal.SessionCreateParams,
     options?: Stripe.RequestOptions
@@ -69,21 +64,24 @@ export class AppService {
     return this.stripe.billingPortal.sessions.create(params, options);
   }
 
-  public async createSampleSubscription(customerId: string) {
-    return this.createSubscription({
-      customer: customerId,
-      items: [
-        {
-          price: 'price_1HrFReDOP6RCnWSqkmH5skxL',
-          quantity: 1,
-        },
-      ],
-    });
+  public async getStripeCustomer(customerId: string) {
+    const customer = await this.stripe.customers.retrieve(customerId)
+    if (customer.deleted) throw new NotFoundException('No such customer')
+    const {
+      id,
+      name,
+    } = customer as Stripe.Customer
+    return {
+      id,
+      name
+    }
   }
-  public async createSubscription(
-    params: Stripe.SubscriptionCreateParams,
-    options?: Stripe.RequestOptions
-  ) {
-    return this.stripe.subscriptions.create(params, options);
+
+  public async getCustomerBySession(sessionId: string) {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId)
+    if (!session || !session.customer) throw new NotFoundException('No such customer')
+    const customerId = typeof session.customer === 'string' ? session.customer : session.customer.id
+    return this.getStripeCustomer(customerId)
   }
+
 }

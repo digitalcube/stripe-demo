@@ -5,6 +5,7 @@
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
+    "start:all": "nx run-many --target serve --all --parallel",
     "build": "nx build",
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
@@ -29,10 +30,12 @@
   },
   "private": true,
   "dependencies": {
+    "@digitalcube/galaxy": "^0.1.98",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/platform-express": "^7.0.0",
-    "aws-northstar": "^1.0.18",
+    "@stripe/react-stripe-js": "^1.1.2",
+    "@stripe/stripe-js": "^1.11.0",
     "aws-serverless-express": "^3.3.8",
     "document-register-element": "1.13.1",
     "express": "^4.17.1",
@@ -41,10 +44,12 @@
     "react-dom": "17.0.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "react-table": "^7.6.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~6.5.5",
     "serverless-lambda-nestjs": "^0.0.2",
     "stripe": "^8.126.0",
+    "theme-ui": "^0.3.4",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
