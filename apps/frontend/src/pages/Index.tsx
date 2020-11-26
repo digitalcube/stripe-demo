@@ -1,8 +1,9 @@
 import React, {FC, useCallback} from 'react'
-import { Benefits, Card, Container, Grid, Heading, Hero, PageHeader, Solutions, Text, } from '@digitalcube/galaxy'
+import { Benefits, Card, Container, Content, Grid, Heading, PageHeader, Text, } from '@digitalcube/galaxy'
 import { Button } from 'theme-ui'
 import { StripePrice, StripeProduct, useListProductsHook } from '../hooks/products'
 import { useStripeCheckout } from '../hooks/checkout';
+import { useCustomerPortalHook } from '../hooks/portal';
 
 const Price: FC<{
     price: StripePrice;
@@ -46,6 +47,35 @@ const Product: FC<{
     )
 }
 
+const CustomerPortal: FC = () => {
+    const url = useCustomerPortalHook()
+    return (
+        <>
+        <PageHeader title="Stripe Customer Portal デモ" subtitle="シンプルな支払い管理ポータル" />
+          <Container
+            size="2"
+            sx={{
+              my: 4,
+            }}
+          >
+            <Content
+              sx={{
+                a: {
+                  color: 'primary',
+                },
+              }}
+            >
+            <p>
+                StripeのCustomer IDとユーザー情報を紐付けすることで、その顧客向けのポータルページを用意することができます。<br/>
+                すでに一度ご利用のブラウザでテスト商品を購入されている場合、この下に購入したプランの支払い情報や履歴などを確認・管理できるURLが表示されます。
+            </p>
+            <p><a href={url} target="_blank" rel="noopener noreferrer">{url}</a></p>
+        </Content>
+        </Container>
+        </>
+    )
+}
+
 export const PageIndex: FC = () => {
     const products = useListProductsHook()
     return (
@@ -71,6 +101,7 @@ export const PageIndex: FC = () => {
                 {products.map(product => <Product product={product} key={product.id} />)}
             </Grid>
         </Container>
+        <CustomerPortal />
         </>
     )
 }
