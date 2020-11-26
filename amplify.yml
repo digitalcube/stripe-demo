@@ -3,7 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm use stable #安定版を利用
+        - nvm use latest
         - echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> ~/.npmrc
         - npm config set _authToken $GITHUB_TOKEN
         - npm config set registry https://npm.pkg.github.com/digitalcube
